@@ -1,51 +1,20 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>واجهة البوت</title>
-  <!-- ✅ مكتبة Telegram WebApp الرسمية -->
+  <meta charset="utf-8">
+  <title>Web App</title>
+  <!-- ⚠️ هذا السطر إلزامي -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    body { font-family: Tahoma, sans-serif; background: #121212; color: white; padding: 20px; }
-    .btn {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 12px;
-      margin: 10px 0;
-      border-radius: 6px;
-      cursor: pointer;
-      width: 100%;
-      font-size: 16px;
-    }
-  </style>
 </head>
 <body>
-  <h2>مرحباً بك في Web App</h2>
-  <button class="btn" onclick="sendData()">إرسال بيانات تجريبية</button>
-
+  <button onclick="test()">اختبار</button>
   <script>
-    // ✅ التحقق من وجود WebApp
-    if (window.Telegram && Telegram.WebApp) {
-      // ⚠️ هذا السطر إلزامي — بدونه، لا يعمل Web App
-      Telegram.WebApp.ready();
+    // ⚠️ هذا السطر إلزامي
+    Telegram.WebApp.ready();
 
-      // اختياري: تكييف الواجهة مع ألوان تلغرام
-      Telegram.WebApp.setHeaderColor('#121212');
-      Telegram.WebApp.setBackgroundColor('#121212');
-
-      // دالة الإرسال
-      function sendData() {
-        Telegram.WebApp.sendData(JSON.stringify({
-          action: "webapp_test",
-          message: "الصفحة تعمل من تلغرام!"
-        }));
-        Telegram.WebApp.close(); // إغلاق بعد الإرسال
-      }
-    } else {
-      // للاختبار خارج تلغرام
-      document.body.innerHTML = '<p style="color:red;text-align:center;">هذه الصفحة تعمل فقط داخل تطبيق Telegram.</p>';
+    function test() {
+      Telegram.WebApp.sendData(JSON.stringify({msg: "عمل!"}));
+      Telegram.WebApp.close();
     }
   </script>
 </body>
