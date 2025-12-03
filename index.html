@@ -6,40 +6,34 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     body { background: #121212; color: white; font-family: Tahoma, sans-serif; padding: 16px; }
-    .code-item { background: #1e1e1e; padding: 12px; margin: 8px 0; border-radius: 8px; }
     .btn { background: #007bff; color: white; border: none; padding: 12px; margin: 8px 0; border-radius: 6px; width: 100%; }
   </style>
 </head>
 <body>
   <h2>بوت تيمو</h2>
-  <div id="user-info"></div>
-  <div id="codes-list"></div>
-  <button id="collect-btn" class="btn" style="display:none;">تجميع كود</button>
-  <button id="add-code-btn" class="btn" style="display:none;">إضافة كود</button>
+  <button class="btn" onclick="startCollect()">تجميع كود</button>
+  <button class="btn" style="background:#6c757d;" onclick="addCode()">إضافة كود</button>
+  <button class="btn" style="background:#28a745;" onclick="reviewRequests()">مراجعة الطلبات</button>
 
   <script>
-    if (!window.Telegram || !Telegram.WebApp) {
-      document.body.innerHTML = '<p style="color:red;">تعمل فقط داخل تلغرام.</p>';
-      throw new Error("Not in Telegram");
+    if (window.Telegram && Telegram.WebApp) {
+      Telegram.WebApp.ready();
+
+      function startCollect() {
+        Telegram.WebApp.sendData(JSON.stringify({ action: "start_collect" }));
+        Telegram.WebApp.close();
+      }
+
+      function addCode() {
+        Telegram.WebApp.sendData(JSON.stringify({ action: "add_code" }));
+        Telegram.WebApp.close();
+      }
+
+      function reviewRequests() {
+        Telegram.WebApp.sendData(JSON.stringify({ action: "admin_review" }));
+        Telegram.WebApp.close();
+      }
     }
-
-    Telegram.WebApp.ready();
-    Telegram.WebApp.setHeaderColor('#121212');
-    Telegram.WebApp.setBackgroundColor('#121212');
-
-    // طلب تحميل البيانات عند فتح الواجهة
-    Telegram.WebApp.sendData(JSON.stringify({ action: "get_user_data" }));
-
-    // معالجة الرد من البوت (سيصلك كرسالة عادية)
-    // → سنستخدم آلية بديلة في البوت لإرسال البيانات
-
-    // أزرار التفاعل
-    document.getElementById('collect-btn').onclick = () => {
-      Telegram.WebApp.sendData(JSON.stringify({ action: "start_collect" }));
-    };
-    document.getElementById('add-code-btn').onclick = () => {
-      Telegram.WebApp.sendData(JSON.stringify({ action: "add_code" }));
-    };
   </script>
 </body>
 </html>
