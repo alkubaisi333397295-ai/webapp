@@ -2,51 +2,78 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>Web App تجريبي</title>
-  <!-- ⚠️ هذا السطر إلزامي -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>بوت تيمو</title>
+  <!-- ⚠️ مطلوب من تلغرام -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    body {
-      background: #121212;
-      color: white;
-      font-family: Tahoma, sans-serif;
-      padding: 20px;
-      text-align: center;
-    }
-    .btn {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 12px 30px;
-      margin: 20px 0;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 16px;
-    }
+    :root { --bg: #121212; --card: #1e1e1e; --text: #ffffff; --accent: #007bff; }
+    body { background: var(--bg); color: var(--text); font-family: Tahoma, sans-serif; padding: 16px; }
+    .code-item { background: var(--card); padding: 12px; margin: 8px 0; border-radius: 8px; }
+    .btn { background: var(--accent); color: white; border: none; padding: 12px; margin: 8px 0; border-radius: 6px; width: 100%; }
   </style>
 </head>
 <body>
-  <h2>مرحباً بك في Web App التجريبي!</h2>
-  <p>إذا ظهرت هذه الصفحة داخل تلغرام، فهي تعمل جزئياً.</p>
-  <p>لكن ليرسل بيانات إلى البوت، يجب أن يحتوي على الكود الصحيح أدناه.</p>
-  
-  <button class="btn" onclick="sendData()">إرسال رسالة تجريبية</button>
+  <h2>بوت تيمو</h2>
+  <div id="user-info" class="card"></div>
+  <div id="codes-list"></div>
+  <button id="collect-btn" class="btn" style="display:none;">تجميع كود</button>
+  <button id="add-code-btn" class="btn" style="display:none;">إضافة كود</button>
 
   <script>
-    // ✅ التحقق من وجود WebApp
-    if (window.Telegram && Telegram.WebApp) {
-      // ⚠️ هذا السطر إلزامي — بدونه، لن يعمل Web App
-      Telegram.WebApp.ready();
+    if (!window.Telegram || !Telegram.WebApp) {
+      document.body.innerHTML = '<p style="color:red;">تعمل فقط داخل تلغرام.</p>';
+      throw new Error("Not in Telegram");
+    }
 
-      function sendData() {
-        Telegram.WebApp.sendData(JSON.stringify({
-          action: "test",
-          message: "Web App يعمل بنجاح!"
-        }));
-        Telegram.WebApp.close();
+    Telegram.WebApp.ready();
+    Telegram.WebApp.setHeaderColor('#121212');
+    Telegram.WebApp.setBackgroundColor('#121212');
+
+    // طلب تحميل البيانات
+    Telegram.WebApp.sendData(JSON.stringify({ action: "get_user_data" }));
+
+    // معالجة الرد من البوت
+    window.addEventListener('message', (event) => {
+      if (event.origin !== 'https://web.telegram.org') return;
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === "load_data") {
+          displayUserData(data);
+        }
+      } catch (e) {
+        console.error("Invalid message", e);
       }
-    } else {
-      document.body.innerHTML = '<p style="color:red;">هذه الصفحة تعمل فقط داخل تلغرام.</p>';
+    });
+
+    function displayUserData(data) {
+      document.getElementById('user-info').innerHTML = `
+        <p>مرحباً @${data.username}</p>
+        <p>الاكواد: ${data.used} / ${data.total}</p>
+      `;
+
+      // عرض الأكواد
+      let codesHtml = '<h3>الأكواد:</h3>';
+      data.codes.forEach(item => {
+        codesHtml += `<div class="code-item">${item.label} <small>(${item.time_left})</small></div>`;
+      });
+      document.getElementById('codes-list').innerHTML = codesHtml;
+
+      // عرض أزرار حسب الحالة
+      if (data.has_pending_codes) {
+        document.getElementById('collect-btn').style.display = 'block';
+      }
+      if (data.is_supervisor) {
+        document.getElementById('add-code-btn').style.display = 'block';
+      }
+
+      // ربط الأزرار
+      document.getElementById('collect-btn').onclick = () => {
+        Telegram.WebApp.sendData(JSON.stringify({ action: "start_collect" }));
+      };
+      document.getElementById('add-code-btn').onclick = () => {
+        Telegram.WebApp.sendData(JSON.stringify({ action: "add_code" }));
+      };
     }
   </script>
 </body>
