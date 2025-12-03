@@ -1,21 +1,83 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Web App</title>
-  <!-- ⚠️ هذا السطر إلزامي -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-</head>
-<body>
-  <button onclick="test()">اختبار</button>
-  <script>
-    // ⚠️ هذا السطر إلزامي
-    Telegram.WebApp.ready();
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Temu WebApp</title>
 
-    function test() {
-      Telegram.WebApp.sendData(JSON.stringify({msg: "عمل!"}));
-      Telegram.WebApp.close();
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: #f5f5f5;
+        color: #333;
     }
-  </script>
+
+    .card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    button {
+        background: #ff7f00;
+        border: none;
+        padding: 12px 18px;
+        color: white;
+        font-size: 16px;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+</style>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+
+<body>
+
+<div class="card">
+    <h2>Welcome to Temu WebApp 👋</h2>
+    <p>This is your custom Telegram WebView.</p>
+</div>
+
+<div class="card">
+    <h3>User Info from Telegram</h3>
+    <p id="user"></p>
+</div>
+
+<div class="card">
+    <button onclick="sendData()">Send Data to Bot</button>
+</div>
+
+<script>
+    // Initialize Telegram Web App API
+    const tg = Telegram.WebApp;
+    tg.expand(); // expands the WebApp to full height
+
+    // Show Telegram User Data
+    const user = tg.initDataUnsafe?.user;
+    if (user) {
+        document.getElementById("user").innerText =
+            `Hello, ${user.first_name}! (ID: ${user.id})`;
+    } else {
+        document.getElementById("user").innerText = "No user data found.";
+    }
+
+    // Send Data Back to Bot
+    function sendData() {
+        const payload = {
+            event: "clicked_button",
+            message: "User clicked Send Data",
+            time: Date.now()
+        };
+
+        tg.sendData(JSON.stringify(payload)); 
+    }
+</script>
+
 </body>
 </html>
