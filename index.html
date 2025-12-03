@@ -6,37 +6,13 @@
 <title>Temu WebApp</title>
 
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 20px;
-        background: #f5f5f5;
-        color: #333;
-    }
-
-    .card {
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-        margin-bottom: 20px;
-        text-align: center;
-    }
-
-    button {
-        background: #ff7f00;
-        border: none;
-        padding: 12px 18px;
-        color: white;
-        font-size: 16px;
-        border-radius: 8px;
-        cursor: pointer;
-    }
+    body { font-family: Arial; margin:0; padding:20px; background:#f5f5f5; color:#333; }
+    .card { background:white; padding:20px; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.15); margin-bottom:20px; text-align:center; }
+    button { background:#ff7f00; border:none; padding:12px 18px; color:white; font-size:16px; border-radius:8px; cursor:pointer; }
 </style>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
-
 <body>
 
 <div class="card">
@@ -50,25 +26,28 @@
 </div>
 
 <div class="card">
-    <button onclick="sendData()">Send Data to Bot</button>
+    <button onclick="sendData()">Send Data to Bo1t</button>
 </div>
-<button onclick="sendData()">Send Data to Bot</button>
 
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
 const tg = Telegram.WebApp;
 tg.expand();
 
+// عرض بيانات المستخدم
+const user = tg.initDataUnsafe?.user;
+document.getElementById("user").innerText = user ? 
+    `Hello, ${user.first_name}! (ID: ${user.id})` : "No user data found.";
+
+// إرسال بيانات للبوت
 function sendData() {
     const payload = {
         event: "clicked_button",
         message: "User clicked Send Data",
         time: Date.now()
     };
-    tg.sendData(JSON.stringify(payload)); // سيتم استقبالها من البوت
+    tg.sendData(JSON.stringify(payload));
 }
 </script>
-
 
 </body>
 </html>
