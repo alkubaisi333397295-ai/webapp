@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,7 +18,7 @@ p { font-size:16px; margin:8px 0; }
 
 <div class="card">
     <h2>مرحبا بك في Temu WebApp 👋</h2>
-    <p>هذا هو WebApp الخاص بك داخل Telegram.</p>
+    <p>اضغط على الزر لإرسال بياناتك للبوت.</p>
 </div>
 
 <div class="card">
@@ -27,7 +27,7 @@ p { font-size:16px; margin:8px 0; }
 </div>
 
 <div class="card">
-    <button id="sendBtn">صصإرسال بيانات للبوت</button>
+    <button id="sendBtn">إرسال بيانات للبوت</button>
 </div>
 
 <script>
@@ -39,7 +39,7 @@ const user = tg.initDataUnsafe?.user;
 document.getElementById("user").innerText = user ? 
     `الاسم: ${user.first_name}\nID: ${user.id}` : "لم يتم العثور على بيانات المستخدم";
 
-// إرسال بيانات للبوت عند الضغط على الزر
+// إرسال البيانات للبوت عند الضغط على الزر
 document.getElementById("sendBtn").addEventListener("click", () => {
     const payload = {
         event: "clicked_button",
