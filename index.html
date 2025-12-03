@@ -37,6 +37,8 @@ tg.expand();
 const user = tg.initDataUnsafe?.user;
 document.getElementById("user").innerText = user ? 
     `Hello, ${user.first_name}! (ID: ${user.id})` : "No user data found.";
+console.log("WebApp version:", Telegram.WebApp);
+alert("User: " + JSON.stringify(Telegram.WebApp.initDataUnsafe.user));
 
 // إرسال بيانات للبوت
 function sendData() {
