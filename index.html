@@ -5,18 +5,37 @@
   <title>Web App</title>
   <!-- ⚠️ هذا السطر إلزامي -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      background: #121212;
+      color: white;
+      font-family: Tahoma, sans-serif;
+      padding: 20px;
+      text-align: center;
+    }
+    .btn {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      margin: 20px 0;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+  </style>
 </head>
-<body style="background:#121212;color:white;padding:20px;font-family:Tahoma;">
+<body>
   <h2>مرحباً بك في Web App</h2>
-  <button onclick="testSend()" style="background:#007bff;color:white;border:none;padding:12px;border-radius:6px;margin-top:10px;">
-    اختبار إرسال البيانات
-  </button>
+  <button class="btn" onclick="sendData()">اختبار إرسال البيانات</button>
 
   <script>
+    // ✅ التحقق من وجود WebApp
     if (window.Telegram && Telegram.WebApp) {
+      // ⚠️ هذا السطر إلزامي — بدونه، لا يعمل Web App
       Telegram.WebApp.ready();
 
-      function testSend() {
+      function sendData() {
         Telegram.WebApp.sendData(JSON.stringify({
           action: "test",
           message: "Web App يعمل من GitHub Pages!"
@@ -24,7 +43,7 @@
         Telegram.WebApp.close();
       }
     } else {
-      document.body.innerHTML = '<p style="color:red;">لا تعمل خارج تلغرام.</p>';
+      document.body.innerHTML = '<p style="color:red;">هذه الصفحة تعمل فقط داخل تلغرام.</p>';
     }
   </script>
 </body>
