@@ -2,136 +2,230 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>واجهة البوت</title>
-  <!-- ⚠️ مطلوب من تلغرام -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>لوحة التحكم</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+    body { background: #f5f5f5; padding: 20px; }
+    .container { max-width: 800px; margin: 0 auto; }
+    h1 { text-align: center; margin: 20px 0; color: #333; }
+    .input-group { display: flex; gap: 10px; margin: 15px 0; }
+    input, button { padding: 10px; font-size: 16px; border-radius: 6px; border: 1px solid #ccc; }
+    button { background: #4CAF50; color: white; cursor: pointer; }
+    button:hover { opacity: 0.9; }
+    button.danger { background: #f44336; }
+    button.warning { background: #ff9800; }
+    .code-item, .ban-item, .user-item {
+      background: white; padding: 15px; margin: 10px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    body {
-      background: #121212;
-      color: white;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      padding: 16px;
-      line-height: 1.5;
-    }
-    .header {
+    .code-header { font-weight: bold; margin-bottom: 5px; color: #2196F3; }
+    .code-time { color: #666; font-size: 14px; }
+    .btn-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .btn-multiline {
+      white-space: pre-wrap;
       text-align: center;
-      padding: 16px 0;
-      border-bottom: 1px solid #333;
-      margin-bottom: 20px;
+      padding: 8px 6px;
+      min-width: 80px;
     }
-    .header h1 {
-      font-size: 24px;
-      color: #007bff;
+    .section { margin: 25px 0; }
+    .section h2 {
+      border-bottom: 2px solid #4CAF50; padding-bottom: 8px; margin-bottom: 15px;
+      color: #333;
     }
-    .info-box {
-      background: #1e1e1e;
-      padding: 16px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-    }
-    .code-item {
-      background: #2a2a2a;
-      padding: 12px;
-      margin: 8px 0;
-      border-radius: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .code-label {
-      font-weight: bold;
-    }
-    .btn {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      margin: 10px 0;
-      border-radius: 8px;
-      cursor: pointer;
-      width: 100%;
-      font-size: 16px;
-      font-weight: bold;
-    }
-    .btn:hover {
-      background: #0056b3;
-    }
-    .btn-secondary {
-      background: #6c757d;
-    }
-    .btn-secondary:hover {
-      background: #5a6268;
-    }
-    .loading {
-      text-align: center;
-      padding: 20px;
-      color: #aaa;
-    }
+    .hidden { display: none; }
+    .status-own { border-left: 4px solid #FF9800; padding-left: 10px; }
+    .status-pending { border-left: 4px solid #2196F3; padding-left: 10px; }
   </style>
 </head>
 <body>
-  <div class="header">
-    <h1>واجهة البوت</h1>
-    <p>مرحباً بك في واجهة Web App الخاصة بك</p>
-  </div>
+  <div class="container">
+    <h1>لوحة التحكم</h1>
 
-  <div class="info-box">
-    <div id="user-info">جارٍ تحميل البيانات...</div>
-  </div>
+    <div class="input-group">
+      <input type="number" id="userId" placeholder="أدخل معرفك (user_id)" />
+      <button onclick="saveUserId()">حفظ</button>
+    </div>
 
-  <div id="codes-container" class="loading">
-    جاري جلب قائمة الأكواد...
-  </div>
+    <div id="authSection">
+      <p>الرجاء إدخال معرف المستخدم أولاً.</p>
+    </div>
 
-  <button id="collect-btn" class="btn" style="display:none;" onclick="startCollect()">تجميع كود</button>
-  <button id="add-code-btn" class="btn btn-secondary" style="display:none;" onclick="addCode()">إضافة كود</button>
-  <button class="btn" onclick="Telegram.WebApp.close()">إغلاق</button>
+    <div id="mainSection" class="hidden">
+      <div class="input-group">
+        <input type="text" id="newCode" placeholder="أدخل كود جديد" />
+        <button onclick="addCode()">إضافة كود</button>
+      </div>
+
+      <!-- عرض الأكواد -->
+      <div class="section">
+        <h2>الأكواد</h2>
+        <div id="codesList"></div>
+      </div>
+
+      <!-- إدارة الحظر -->
+      <div class="section">
+        <h2>المحظورون</h2>
+        <button onclick="loadBanned()">تحديث القائمة</button>
+        <div id="bannedList"></div>
+      </div>
+
+      <!-- حظر مستخدم -->
+      <div class="section">
+        <h2>حظر مستخدم</h2>
+        <div id="usersList"></div>
+        <button onclick="loadUsers()">عرض المستخدمين</button>
+      </div>
+    </div>
+  </div>
 
   <script>
-    // ✅ التحقق من وجود WebApp
-    if (window.Telegram && Telegram.WebApp) {
-      // ⚠️ إلزامي: إخبار تلغرام أن الصفحة جاهزة
-      Telegram.WebApp.ready();
-      Telegram.WebApp.setHeaderColor('#121212');
-      Telegram.WebApp.setBackgroundColor('#121212');
+    let USER_ID = localStorage.getItem('user_id') || null;
+    const API_BASE = 'http://localhost:5000/api';
 
-      // إرسال طلب للحصول على بيانات المستخدم
-      Telegram.WebApp.sendData(JSON.stringify({
-        action: "get_user_data"
-      }));
-
-      // معالجة الرد من البوت (سنتلقى الرد كـ رسالة عادية، لذا سنستخدم خدعة بسيطة)
-      // لكن الأفضل: استخدام Telegram.WebApp.onEvent (غير مدعوم في كل الإصدارات)
-      // لذا سنعتمد على زر "تجميع" يُفعّل الإرسال
-
-      function startCollect() {
-        Telegram.WebApp.sendData(JSON.stringify({
-          action: "start_collect"
-        }));
-        Telegram.WebApp.close();
+    function saveUserId() {
+      const id = document.getElementById('userId').value.trim();
+      if (!id || isNaN(id)) {
+        alert('يرجى إدخال معرف رقمي صحيح.');
+        return;
       }
+      USER_ID = parseInt(id);
+      localStorage.setItem('user_id', USER_ID);
+      document.getElementById('authSection').classList.add('hidden');
+      document.getElementById('mainSection').classList.remove('hidden');
+      loadAll();
+    }
 
-      function addCode() {
-        Telegram.WebApp.sendData(JSON.stringify({
-          action: "add_code"
-        }));
-        Telegram.WebApp.close();
+    function isAdmin() {
+      // يمكنك تعديل هذا ليدعم ADMINS إذا أردت
+      return true; // نفترض أنك مشرف دائمًا
+    }
+
+    async function apiCall(endpoint, options = {}) {
+      try {
+        const res = await fetch(`${API_BASE}${endpoint}`, {
+          ...options,
+          headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }
+        });
+        if (!res.ok) throw new Error(`الحالة: ${res.status}`);
+        return await res.json();
+      } catch (err) {
+        alert(`❌ خطأ في الاتصال: ${err.message}\nتأكد من تشغيل api.py`);
+        return null;
       }
+    }
 
-      // عند فتح الواجهة، نعرض رسالة ترحيب مؤقتة
-      document.getElementById('user-info').innerHTML = 'مرحباً بك! هذه واجهة Web App.';
-      document.getElementById('codes-container').innerHTML = '<p>لعرض أكوادك، ارجع إلى الدردشة واتبع التعليمات.</p>';
-      document.getElementById('collect-btn').style.display = 'block';
-      document.getElementById('add-code-btn').style.display = 'block';
+    // --- الأكواد ---
+    async function loadCodes() {
+      const codes = await apiCall(`/codes?user_id=${USER_ID}&is_admin=${isAdmin()}`);
+      if (!codes) return;
+      const list = document.getElementById('codesList');
+      list.innerHTML = '';
+      codes.forEach(item => {
+        const div = document.createElement('div');
+        div.className = `code-item status-${item.status}`;
+        let title = item.status === 'own' ? 'كودك' : 'تجميع';
+        div.innerHTML = `
+          <div class="code-header">${title} : ${item.code}</div>
+          <div class="code-time">الوقت المتبقى: ${item.time_left}</div>
+          <div class="btn-group">
+            <button class="danger btn-multiline" onclick="deleteCode('${item.code}')">حذف\nالكود</button>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
 
-    } else {
-      document.body.innerHTML = '<div style="color:#ff4444;text-align:center;padding:30px;">هذه الصفحة تعمل فقط داخل تطبيق Telegram.</div>';
+    async function addCode() {
+      const code = document.getElementById('newCode').value.trim();
+      if (!code) return alert('الرجاء إدخال كود.');
+      const res = await apiCall('/add_code', {
+        method: 'POST',
+        body: JSON.stringify({ code, added_by: USER_ID })
+      });
+      if (res && res.success) {
+        document.getElementById('newCode').value = '';
+        loadCodes();
+      }
+    }
+
+    async function deleteCode(code) {
+      if (!confirm(`هل أنت متأكد من حذف الكود: ${code}؟`)) return;
+      await apiCall('/delete_code', {
+        method: 'POST',
+        body: JSON.stringify({ code })
+      });
+      loadCodes();
+    }
+
+    // --- الحظر ---
+    async function loadBanned() {
+      const bans = await apiCall('/banned');
+      if (!bans) return;
+      const list = document.getElementById('bannedList');
+      list.innerHTML = '';
+      bans.forEach(ban => {
+        const div = document.createElement('div');
+        div.className = 'ban-item';
+        div.innerHTML = `
+          <div>المحظور: ID:${ban.user_id}</div>
+          <div>تاريخ الحظر: ${ban.banned_at}</div>
+          <div>بواسطة: ID:${ban.banned_by}</div>
+          <div class="btn-group">
+            <button class="warning btn-multiline" onclick="unbanUser(${ban.user_id})">فك\nالحظر</button>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    async function unbanUser(userId) {
+      if (!confirm(`هل تريد فك الحظر عن ID:${userId}؟`)) return;
+      await apiCall('/unban', {
+        method: 'POST',
+        body: JSON.stringify({ user_id: userId })
+      });
+      loadBanned();
+    }
+
+    // --- المستخدمون ---
+    async function loadUsers() {
+      const users = await apiCall('/users');
+      if (!users) return;
+      const list = document.getElementById('usersList');
+      list.innerHTML = '';
+      users.forEach(u => {
+        const div = document.createElement('div');
+        div.className = 'user-item';
+        div.innerHTML = `
+          <div>المستخدم: ${u.username ? '@' + u.username : 'ID:' + u.user_id}</div>
+          <button class="danger" onclick="banUser(${u.user_id})">حظر</button>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    async function banUser(userId) {
+      if (!confirm(`تأكيد حظر ID:${userId}؟`)) return;
+      await apiCall('/ban', {
+        method: 'POST',
+        body: JSON.stringify({ user_id: userId, banned_by: USER_ID })
+      });
+      loadBanned();
+    }
+
+    // --- التحميل الأولي ---
+    function loadAll() {
+      loadCodes();
+      loadBanned();
+      loadUsers();
+    }
+
+    // --- تهيئة الصفحة ---
+    if (USER_ID) {
+      document.getElementById('userId').value = USER_ID;
+      document.getElementById('authSection').classList.add('hidden');
+      document.getElementById('mainSection').classList.remove('hidden');
+      loadAll();
     }
   </script>
 </body>
