@@ -2,37 +2,136 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>بوت تيمو</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>واجهة البوت</title>
+  <!-- ⚠️ مطلوب من تلغرام -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    body { background: #121212; color: white; font-family: Tahoma, sans-serif; padding: 16px; }
-    .btn { background: #007bff; color: white; border: none; padding: 12px; margin: 8px 0; border-radius: 6px; width: 100%; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: #121212;
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 16px;
+      line-height: 1.5;
+    }
+    .header {
+      text-align: center;
+      padding: 16px 0;
+      border-bottom: 1px solid #333;
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      font-size: 24px;
+      color: #007bff;
+    }
+    .info-box {
+      background: #1e1e1e;
+      padding: 16px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    .code-item {
+      background: #2a2a2a;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .code-label {
+      font-weight: bold;
+    }
+    .btn {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      margin: 10px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .btn:hover {
+      background: #0056b3;
+    }
+    .btn-secondary {
+      background: #6c757d;
+    }
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #aaa;
+    }
   </style>
 </head>
 <body>
-  <h2>بوت تيمو</h2>
-  <button class="btn" onclick="startCollect()">تجميع كود</button>
-  <button class="btn" style="background:#6c757d;" onclick="addCode()">إضافة كود</button>
-  <button class="btn" style="background:#28a745;" onclick="reviewRequests()">مراجعة الطلبات</button>
+  <div class="header">
+    <h1>واجهة البوت</h1>
+    <p>مرحباً بك في واجهة Web App الخاصة بك</p>
+  </div>
+
+  <div class="info-box">
+    <div id="user-info">جارٍ تحميل البيانات...</div>
+  </div>
+
+  <div id="codes-container" class="loading">
+    جاري جلب قائمة الأكواد...
+  </div>
+
+  <button id="collect-btn" class="btn" style="display:none;" onclick="startCollect()">تجميع كود</button>
+  <button id="add-code-btn" class="btn btn-secondary" style="display:none;" onclick="addCode()">إضافة كود</button>
+  <button class="btn" onclick="Telegram.WebApp.close()">إغلاق</button>
 
   <script>
+    // ✅ التحقق من وجود WebApp
     if (window.Telegram && Telegram.WebApp) {
+      // ⚠️ إلزامي: إخبار تلغرام أن الصفحة جاهزة
       Telegram.WebApp.ready();
+      Telegram.WebApp.setHeaderColor('#121212');
+      Telegram.WebApp.setBackgroundColor('#121212');
+
+      // إرسال طلب للحصول على بيانات المستخدم
+      Telegram.WebApp.sendData(JSON.stringify({
+        action: "get_user_data"
+      }));
+
+      // معالجة الرد من البوت (سنتلقى الرد كـ رسالة عادية، لذا سنستخدم خدعة بسيطة)
+      // لكن الأفضل: استخدام Telegram.WebApp.onEvent (غير مدعوم في كل الإصدارات)
+      // لذا سنعتمد على زر "تجميع" يُفعّل الإرسال
 
       function startCollect() {
-        Telegram.WebApp.sendData(JSON.stringify({ action: "start_collect" }));
+        Telegram.WebApp.sendData(JSON.stringify({
+          action: "start_collect"
+        }));
         Telegram.WebApp.close();
       }
 
       function addCode() {
-        Telegram.WebApp.sendData(JSON.stringify({ action: "add_code" }));
+        Telegram.WebApp.sendData(JSON.stringify({
+          action: "add_code"
+        }));
         Telegram.WebApp.close();
       }
 
-      function reviewRequests() {
-        Telegram.WebApp.sendData(JSON.stringify({ action: "admin_review" }));
-        Telegram.WebApp.close();
-      }
+      // عند فتح الواجهة، نعرض رسالة ترحيب مؤقتة
+      document.getElementById('user-info').innerHTML = 'مرحباً بك! هذه واجهة Web App.';
+      document.getElementById('codes-container').innerHTML = '<p>لعرض أكوادك، ارجع إلى الدردشة واتبع التعليمات.</p>';
+      document.getElementById('collect-btn').style.display = 'block';
+      document.getElementById('add-code-btn').style.display = 'block';
+
+    } else {
+      document.body.innerHTML = '<div style="color:#ff4444;text-align:center;padding:30px;">هذه الصفحة تعمل فقط داخل تطبيق Telegram.</div>';
     }
   </script>
 </body>
